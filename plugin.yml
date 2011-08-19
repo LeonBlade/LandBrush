@@ -1,0 +1,15 @@
+name: LandBrush
+version: 0.1
+description: A smart plugin that makes creating new land easy.
+author: LeonBlade
+main: me.leonblade.landbrush.LandBrush
+commands:
+    landbrush:
+        description: The base of all commands for landbrush
+        aliases: lb
+        permission: landbrush
+        usage: /<command> <func> [<arg0> ... <argX>]
+        
+permissions:
+    landbrush.*:
+        description: Gives access to using LandBrush
