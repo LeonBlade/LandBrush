@@ -31,7 +31,7 @@ public class LandBrush extends JavaPlugin {
 		
 		for (Player p : getServer().getOnlinePlayers()) {
 			this.landBrushPlayers.put(p.getName(), new LandBrushPlayer(p));
-			log.info("["+getDescription().getName() + "] Adding player " + p.getName());
+			log.info("["+getDescription().getName()+"] Adding player " + p.getName());
 		}
 		
 		// get the plugin manager and register some events
@@ -106,23 +106,14 @@ public class LandBrush extends JavaPlugin {
 				}
 				// the time traveling machine
 				else if (args[0].equalsIgnoreCase("undo")) {
-					if (!args[1].isEmpty()) {
-						try {
-							if (Integer.parseInt(args[1]) == 88) {
-								sender.sendMessage(ChatColor.LIGHT_PURPLE + "WHAT DID I TELL YOU?!  88 MILES PER HOUR!");
-							}
-							if (args[1].equalsIgnoreCase("doctor")) {
-								sender.sendMessage(ChatColor.LIGHT_PURPLE + "You are brilliant.");
-							}
-						} catch (NumberFormatException e) {}
-					}
 					lbp.undo();
 					return true;
 				}
 			}
 		// something went wrong when entering a command
 		} catch (Exception e) {
-			log.warning("[LandBrush] Error: Player " + lbp.getPlayer().getName() + " tried to access a command => " + e.getCause().getLocalizedMessage());
+			log.warning("[LandBrush] Error: Player " + lbp.getPlayer().getName() + " tried to access a command => " + 
+							e.getCause().getLocalizedMessage());
 			return false;
 		}		 
 		return false;
