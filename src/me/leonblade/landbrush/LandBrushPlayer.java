@@ -2,9 +2,9 @@ package me.leonblade.landbrush;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -12,6 +12,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class LandBrushPlayer {
+	protected static final Logger log = Logger.getLogger("Minecraft");
 	private Player player;
 	private int baseY = -1;
 	private int brushSize = 5;
@@ -28,11 +29,11 @@ public class LandBrushPlayer {
 	
 	// land brush undo hash set to hold all
 	public static class LBUndo {
-		public HashMap<Location, LBBlock> hm = new HashMap<Location, LBBlock>();
+		public HashSet<LBBlock> hs = new HashSet<LBBlock>();
 		
 		// store a new block in the hash set
 		public void put(Block b) {
-			this.hm.put(b.getLocation(), new LBBlock(b));
+			this.hs.add(new LBBlock(b));
 		}
 	}
 	
@@ -66,13 +67,13 @@ public class LandBrushPlayer {
 	public void undo() {
 		if (this.hashEn > 0) {
 			LBUndo u = this.hashUndo.get(this.hashEn - 1);
-			for (LBBlock lb : u.hm.values()) {
-				setBlock(lb);
+			for (LBBlock b : u.hs) {
+				setBlock(b);
 			}
 			this.hashUndo.remove(this.hashEn - 1);
 			this.hashEn--;
 			this.player.sendMessage(ChatColor.GREEN + "Undo successful " + 
-									ChatColor.YELLOW + u.hm.size() + ChatColor.GREEN + " blocks have been replaced.");
+									ChatColor.YELLOW + u.hs.size() + ChatColor.GREEN + " blocks have been replaced.");
 		} else {
 			this.player.sendMessage(ChatColor.RED + "Nothing left to undo.");
 		}
@@ -138,6 +139,7 @@ public class LandBrushPlayer {
 	public void addUndoStep(LBUndo u) {
 		this.hashUndo.put(this.hashEn, u);
 		this.hashEn++;
+		log.info("hashEn = " + this.hashEn);
 	}
 	
 	// replace a block to it's former ID and data for undo

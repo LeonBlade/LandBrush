@@ -116,7 +116,7 @@ public class Brush {
 		// grab the block
 		Block b = this.lbPlayer.getPlayer().getWorld().getBlockAt(x, targetY, z);
 		// place the block there if a block in that position in this draw already hasn't been made
-		if (undo.hm.get(b.getLocation()) == null)
+		if (!undo.hs.contains(b))
 			undo.put(b);		
 		// now we can change the block after we saved it in our hashmap
 		b.setType(type);
