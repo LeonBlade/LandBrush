@@ -1,10 +1,10 @@
 package me.leonblade.landbrush;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -17,6 +17,7 @@ public class LandBrushPlayer {
 	private int baseY = -1;
 	private int brushSize = 5;
 	private double brushScale = 3.0;
+	private Material[] materials = { Material.DIRT, Material.SAND, Material.GRASS };
 	private int hashEn = 0;
 	private Material tool = Material.WOOD_SPADE;
 	private HashMap<Integer, LBUndo> hashUndo = new HashMap<Integer, LBUndo>();
@@ -29,11 +30,11 @@ public class LandBrushPlayer {
 	
 	// land brush undo hash set to hold all
 	public static class LBUndo {
-		public HashSet<LBBlock> hs = new HashSet<LBBlock>();
+		public HashMap<Location, LBBlock> hs = new HashMap<Location, LBBlock>();
 		
 		// store a new block in the hash set
 		public void put(Block b) {
-			this.hs.add(new LBBlock(b));
+			this.hs.put(b.getLocation(), new LBBlock(b));
 		}
 	}
 	
@@ -67,7 +68,7 @@ public class LandBrushPlayer {
 	public void undo() {
 		if (this.hashEn > 0) {
 			LBUndo u = this.hashUndo.get(this.hashEn - 1);
-			for (LBBlock b : u.hs) {
+			for (LBBlock b : u.hs.values()) {
 				setBlock(b);
 			}
 			this.hashUndo.remove(this.hashEn - 1);
@@ -135,11 +136,20 @@ public class LandBrushPlayer {
 		return this.brushScale;
 	}
 	
+	// set the materials
+	public void setMaterials(Material[] m) {
+		this.materials = m;
+	}
+	
+	// get the materials
+	public Material[] getMaterials() {
+		return this.materials;
+	}
+	
 	// add undo action
 	public void addUndoStep(LBUndo u) {
 		this.hashUndo.put(this.hashEn, u);
 		this.hashEn++;
-		log.info("hashEn = " + this.hashEn);
 	}
 	
 	// replace a block to it's former ID and data for undo

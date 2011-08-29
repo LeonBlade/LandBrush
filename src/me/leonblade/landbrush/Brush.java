@@ -11,7 +11,7 @@ public class Brush {
 
 	private LandBrushPlayer lbPlayer;
 	private int targetY;
-	private Material type;
+	private Material currentType;
 	private LBUndo undo = new LBUndo();
 	
 	public Brush(LandBrushPlayer player) {
@@ -26,33 +26,32 @@ public class Brush {
 		Block b = hb.getTargetBlock();
 		Random rand = new Random();
 		Integer tempRadius;
+		Material[] materials = this.lbPlayer.getMaterials();
 		
 		// first we want to lay down dirt at the very bottom so we set the material to dirt
-		type = Material.DIRT;
+		currentType = materials[0];
 		tempRadius = this.lbPlayer.getBrushSize() + (int) (this.lbPlayer.getBrushSize() * this.lbPlayer.getScale()) + rand.nextInt((int) this.lbPlayer.getScale()) + 1;
 		targetY = this.lbPlayer.getBaseY();
 		circle(b.getX(), b.getZ(), tempRadius);
 		
 		// now we can lay down some sand
-		type = Material.SAND;
+		currentType = materials[1];
 		tempRadius = this.lbPlayer.getBrushSize() + (int) (this.lbPlayer.getBrushSize() * (this.lbPlayer.getScale()*0.5)) + rand.nextInt((int) this.lbPlayer.getScale()) + 1;
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);
 		
 		// now we can lay down some more sand
-		type = Material.SAND;
 		tempRadius = this.lbPlayer.getBrushSize() + (int) (this.lbPlayer.getBrushSize() * (this.lbPlayer.getScale()*0.2)) + rand.nextInt((int) this.lbPlayer.getScale()) + 1;
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);
 		
 		// now we can lay down one more sand disk
-		type = Material.SAND;
 		tempRadius = this.lbPlayer.getBrushSize() + rand.nextInt(2) + 1;
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);
 		
 		// now we can lay down one more sand disk
-		type = Material.GRASS;
+		currentType = materials[2];
 		// setting the range to the this.lbPlayer.getBrushSize()
 		tempRadius = this.lbPlayer.getBrushSize();
 		targetY++;
@@ -60,6 +59,7 @@ public class Brush {
 		
 		// push our undo to the player
 		this.lbPlayer.addUndoStep(undo);
+		undo = new LBUndo();
 	}
 	
 	// draw circle will draw a circle based on a this.lbPlayer.getBrushSize() and a starting block
@@ -116,9 +116,9 @@ public class Brush {
 		// grab the block
 		Block b = this.lbPlayer.getPlayer().getWorld().getBlockAt(x, targetY, z);
 		// place the block there if a block in that position in this draw already hasn't been made
-		if (!undo.hs.contains(b))
+		if (!undo.hs.containsKey(b.getLocation()))
 			undo.put(b);		
 		// now we can change the block after we saved it in our hashmap
-		b.setType(type);
+		b.setType(currentType);
 	}	
 }
