@@ -238,8 +238,10 @@ public class LandBrush extends JavaPlugin {
 	// remove them from hashmap
 	public void removeLandBrushPlayer(Player player) {
 		try {
-			this.landBrushPlayers.remove(player.getName());
-			player.sendMessage(ChatColor.RED + "LandBrush diabled.");
+			if (this.landBrushPlayers.containsKey(player.getName())) {
+				this.landBrushPlayers.remove(player.getName());
+				player.sendMessage(ChatColor.RED + "LandBrush diabled.");
+			}
 		}
 		catch (NullPointerException e) {}
 	}
