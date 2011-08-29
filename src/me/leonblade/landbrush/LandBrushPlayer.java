@@ -17,7 +17,7 @@ public class LandBrushPlayer {
 	private int baseY = -1;
 	private int brushSize = 5;
 	private double brushScale = 3.0;
-	private Material[] materials = { Material.DIRT, Material.SAND, Material.GRASS };
+	private Material[] materials = { Material.SAND, Material.GRASS };
 	private int hashEn = 0;
 	private Material tool = Material.WOOD_SPADE;
 	private HashMap<Integer, LBUndo> hashUndo = new HashMap<Integer, LBUndo>();

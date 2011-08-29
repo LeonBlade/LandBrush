@@ -10,8 +10,13 @@ import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.nijiko.permissions.PermissionHandler;
+import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class LandBrush extends JavaPlugin {
 
@@ -19,6 +24,7 @@ public class LandBrush extends JavaPlugin {
 	private final LandBrushPlayerListener landBrushPlayerListener = new LandBrushPlayerListener(this);
 	protected static final Logger log = Logger.getLogger("Minecraft");
 	private static String logPrefix;
+	public static PermissionHandler permissionHandler;
 	
 	@Override
 	public void onDisable() {
@@ -30,12 +36,15 @@ public class LandBrush extends JavaPlugin {
 	public void onEnable() {
 		// let the console know our plugin has been enabled
 		log.info(getDescription().getName() + " version " + getDescription().getVersion() + " has been enabled.");
+		log.info(String.valueOf((getServer().getOnlinePlayers().length)));
+		
+		// in case people are using permissions plugin
+		setupPermissions();
 		
 		logPrefix = "[" + getDescription().getName() + "] ";
 		
 		for (Player p : getServer().getOnlinePlayers()) {
-			this.landBrushPlayers.put(p.getName(), new LandBrushPlayer(p));
-			log.info(logPrefix + "Adding player " + p.getName());
+			this.addLandBrushPlayer(p);
 		}
 		
 		// get the plugin manager and register some events
@@ -55,8 +64,8 @@ public class LandBrush extends JavaPlugin {
 		sender.sendMessage("/" + label + " tool wood_spade " + ChatColor.GRAY + "(sets the tool by name)");
 		sender.sendMessage("/" + label + " tool 269 " + ChatColor.GRAY + "(sets the tool by ID)");
 		sender.sendMessage("/" + label + " scale 3 " + ChatColor.GRAY + "(sets the scale of the beach sand)");
-		sender.sendMessage("/" + label + " material 3 12 2 " + ChatColor.GRAY + "(sets materials by ID)");
-		sender.sendMessage("/" + label + " material dirt sand grass " + ChatColor.GRAY + "(sets materials by name)");
+		sender.sendMessage("/" + label + " material 12 2 " + ChatColor.GRAY + "(sets materials by ID)");
+		sender.sendMessage("/" + label + " material sand grass " + ChatColor.GRAY + "(sets materials by name)");
 	}
 	
 	@Override
@@ -69,14 +78,14 @@ public class LandBrush extends JavaPlugin {
 		// get the landbrush player from the sender
 		try {
 			LandBrushPlayer lbp = this.landBrushPlayers.get(((Player) sender).getName());
-			if (command.getName().equalsIgnoreCase("landbrush") && args.length >= 1) {
-				// help commands
+			if (command.getName().equalsIgnoreCase("landbrush") && args.length >= 1 && (p.hasPermission("landbrush.*") || permissionHandler.has(p, "landbrush.*"))) {
+				// help command				
 				if (args[0].equalsIgnoreCase("help")) {
 					showHelp(sender, label);
 					return true;
 				}
 				else if (args[0].equalsIgnoreCase("default")) {
-					Material[] dm = { Material.DIRT, Material.SAND, Material.GRASS };
+					Material[] dm = { Material.SAND, Material.GRASS };
 					lbp.setBrushSize(5);
 					lbp.setScale(3.0);
 					lbp.setMaterials(dm);
@@ -98,24 +107,43 @@ public class LandBrush extends JavaPlugin {
 						} 
 						catch (NumberFormatException e) {
 							sender.sendMessage(ChatColor.RED + "ERROR: Neither string or integer value found for tool.");
-							return false;
 						}
 					}
 					return true;
 				}
 				// setting the new tool
 				else if (args[0].equalsIgnoreCase("tool")) {
-					Material tool = Material.WOOD_SPADE;
-					try {
-						tool = Material.matchMaterial(args[1]);
+					// if we only passed in tool and nothing else
+					if (args.length == 1) {
+						// if our current item in hand is nothing
+						try {
+							if (p.getItemInHand().getType().equals(Material.AIR)) {
+								// give us the tool
+								p.setItemInHand(new ItemStack(lbp.getTool(), 1, (short)0));
+							}
+							else {
+								// if we have an item in our hand set the tool to this item
+								lbp.setTool(p.getItemInHand().getType());
+							}
+						}
+						catch (NullPointerException e) {
+							
+						}
 					}
-					// this material doesn't exist
-					catch (NullPointerException e) {
-						log.warning(logPrefix + "ERROR: matchMaterial() - Caused by an attempt at setting tool to " + args[1]);
-						sender.sendMessage(ChatColor.RED + "ERROR: Invalid material type \"" + args[1] + "\"");
-						return true;
+					// if we have passed in something
+					else {
+						// by default we want to make the tool the wooden shovel
+						Material tool = Material.WOOD_SPADE;
+						try {
+							tool = Material.matchMaterial(args[1]);
+						}
+						// this material doesn't exist
+						catch (NullPointerException e) {
+							log.warning(logPrefix + "ERROR: matchMaterial() - Caused by an attempt at setting tool to " + args[1]);
+							sender.sendMessage(ChatColor.RED + "ERROR: Invalid material type \"" + args[1] + "\"");
+						}
+						lbp.setTool(tool);
 					}
-					lbp.setTool(tool);				
 					return true;
 				}
 				// setting the scale
@@ -126,19 +154,17 @@ public class LandBrush extends JavaPlugin {
 					// catch a number format exception which means we didn't enter a number
 					catch (NumberFormatException e) {
 						sender.sendMessage(ChatColor.RED + "ERROR: Scale needs to be a double value (3.0 by default).");
-						return true;
 					}					
 					return true;
 				}
 				// setting the new tool
 				else if (args[0].equalsIgnoreCase("material")) {
-					if (args.length == 4) {
-						Material[] m = { Material.DIRT, Material.SAND, Material.GRASS };
+					if (args.length == 3) {
+						Material[] m = { Material.SAND, Material.GRASS };
 						m[0] = Material.matchMaterial(args[1]);
 						m[1] = Material.matchMaterial(args[2]);
-						m[2] = Material.matchMaterial(args[3]);
-						if ((m[0].isBlock() || m[0] == null) && m[1].isBlock() && m[2].isBlock()) {
-							sender.sendMessage(ChatColor.AQUA + "Materials set to " + ChatColor.YELLOW + m[0].toString() + " " + m[1].toString() + " " + m[2].toString() + ChatColor.AQUA + ".");
+						if ((m[0].isBlock()) && m[1].isBlock()) {
+							sender.sendMessage(ChatColor.AQUA + "Materials set to " + ChatColor.YELLOW + m[0].toString() + " " + m[1].toString() + ChatColor.AQUA + ".");
 							lbp.setMaterials(m);
 						}
 						else {
@@ -160,7 +186,6 @@ public class LandBrush extends JavaPlugin {
 				showHelp(sender, label);
 				return true;
 			}
-				
 		// something else went wrong
 		} 
 		catch (CommandException e) {
@@ -181,7 +206,55 @@ public class LandBrush extends JavaPlugin {
 	
 	// gets the hashmap for landbrush players
 	public HashMap<String, LandBrushPlayer> getLandBrushPlayers() {
-		return landBrushPlayers;
+		return this.landBrushPlayers;
 	}
 	
+	// makes sure that we add a player into the hashmap
+	public void addLandBrushPlayer(Player player) {
+		if (player.hasPermission("landbrush.*") || permissionHandler.has(player, "landbrush.*")) {
+			player.sendMessage(ChatColor.GREEN + "LandBrush enabled!");
+			// if our player exists
+			LandBrushPlayer lbp;
+			try {
+				lbp = this.landBrushPlayers.get(player.getName());
+				this.landBrushPlayers.remove(player.getName());
+				this.landBrushPlayers.put(player.getName(), new LandBrushPlayer(player));
+			}
+			// the player does not exist
+			catch (NullPointerException e) {
+				lbp = new LandBrushPlayer(player);
+				this.landBrushPlayers.put(player.getName(), lbp);
+				log.info("Player is now a landbrush player " + player.getName());
+				player.sendMessage(ChatColor.GREEN + "You're now a LandBrush player!");
+			}
+		}
+		else {
+			try {
+				this.landBrushPlayers.remove(player.getName());
+			} catch (NullPointerException e) {}
+		}
+	}
+	
+	// remove them from hashmap
+	public void removeLandBrushPlayer(Player player) {
+		try {
+			this.landBrushPlayers.remove(player.getName());
+			player.sendMessage(ChatColor.RED + "LandBrush diabled.");
+		}
+		catch (NullPointerException e) {}
+	}
+	
+	private void setupPermissions() { 
+		if (permissionHandler != null) { return; }
+		Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
+
+		if (permissionsPlugin == null) {
+			log.info("Permission system not detected, defaulting to OP");
+		    return;
+		}
+
+		permissionHandler = ((Permissions) permissionsPlugin).getHandler();
+		log.info("Found and will use plugin "+((Permissions)permissionsPlugin).getDescription().getFullName());
+	}
+
 }

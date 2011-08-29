@@ -29,13 +29,7 @@ public class Brush {
 		Material[] materials = this.lbPlayer.getMaterials();
 		targetY = this.lbPlayer.getBaseY();
 		
-		if (materials[0] != null) {
-			currentType = materials[0];
-			tempRadius = this.lbPlayer.getBrushSize() + (int) (this.lbPlayer.getBrushSize() * this.lbPlayer.getScale()) + rand.nextInt((int) this.lbPlayer.getScale()) + 1;
-			circle(b.getX(), b.getZ(), tempRadius);
-		}
-		
-		currentType = materials[1];
+		currentType = materials[0];
 		tempRadius = this.lbPlayer.getBrushSize() + (int) (this.lbPlayer.getBrushSize() * (this.lbPlayer.getScale()*0.5)) + rand.nextInt((int) this.lbPlayer.getScale()) + 1;
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);
@@ -48,7 +42,7 @@ public class Brush {
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);
 		
-		currentType = materials[2];
+		currentType = materials[1];
 		tempRadius = this.lbPlayer.getBrushSize();
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);	
