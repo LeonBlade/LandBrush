@@ -44,12 +44,27 @@ public class LandBrush extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_JOIN, landBrushPlayerListener, Event.Priority.Normal, this);
 	}
 	
+	private void showHelp(CommandSender sender, String label) {
+		sender.sendMessage(ChatColor.LIGHT_PURPLE + "LandBrush Help Menu");
+		sender.sendMessage("/" + label + " help " + ChatColor.GRAY + "(shows this menu)");
+		sender.sendMessage("/" + label + " default " + ChatColor.GRAY + "(sets settings to default)");
+		sender.sendMessage("/" + label + " undo " + ChatColor.GRAY + "(goes back in time via a TARDIS)");
+		sender.sendMessage("/" + label + " size 5 " + ChatColor.GRAY + "(sets brush size)");
+		sender.sendMessage("/" + label + " base me" + ChatColor.GRAY + "(sets base height to your Y position)");
+		sender.sendMessage("/" + label + " base 72 " + ChatColor.GRAY + "(sets base size statically)");
+		sender.sendMessage("/" + label + " tool wood_spade " + ChatColor.GRAY + "(sets the tool by name)");
+		sender.sendMessage("/" + label + " tool 269 " + ChatColor.GRAY + "(sets the tool by ID)");
+		sender.sendMessage("/" + label + " scale 3 " + ChatColor.GRAY + "(sets the scale of the beach sand)");
+		sender.sendMessage("/" + label + " material 3 12 2 " + ChatColor.GRAY + "(sets materials by ID)");
+		sender.sendMessage("/" + label + " material dirt sand grass " + ChatColor.GRAY + "(sets materials by name)");
+	}
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		Player p = ((Player)sender);
 		String arglist = "";
 		for (int i = 0; i < args.length; i++) {
-			arglist.concat(args[i] + " ");
+			arglist = arglist.concat(args[i] + " ");
 		}
 		// get the landbrush player from the sender
 		try {
@@ -57,17 +72,14 @@ public class LandBrush extends JavaPlugin {
 			if (command.getName().equalsIgnoreCase("landbrush") && args.length >= 1) {
 				// help commands
 				if (args[0].equalsIgnoreCase("help")) {
-					sender.sendMessage(ChatColor.LIGHT_PURPLE + "LandBrush Help Menu");
-					sender.sendMessage("/" + label + " help " + ChatColor.GRAY + "(shows this menu)");
-					sender.sendMessage("/" + label + " undo " + ChatColor.GRAY + "(goes back in time via a TARDIS)");
-					sender.sendMessage("/" + label + " size 5 " + ChatColor.GRAY + "(sets brush size)");
-					sender.sendMessage("/" + label + " base me" + ChatColor.GRAY + "(sets base height to your Y position)");
-					sender.sendMessage("/" + label + " base 72 " + ChatColor.GRAY + "(sets base size statically)");
-					sender.sendMessage("/" + label + " tool wood_spade " + ChatColor.GRAY + "(sets the tool by name)");
-					sender.sendMessage("/" + label + " tool 269 " + ChatColor.GRAY + "(sets the tool by ID)");
-					sender.sendMessage("/" + label + " scale 3 " + ChatColor.GRAY + "(sets the scale of the beach sand)");
-					sender.sendMessage("/" + label + " material 3 12 2 " + ChatColor.GRAY + "(sets materials from bottom to top by ID)");
-					sender.sendMessage("/" + label + " material dirt sand grass " + ChatColor.GRAY + "(sets materials from bottom to top by name)");
+					showHelp(sender, label);
+					return true;
+				}
+				else if (args[0].equalsIgnoreCase("default")) {
+					Material[] dm = { Material.DIRT, Material.SAND, Material.GRASS };
+					lbp.setBrushSize(5);
+					lbp.setScale(3.0);
+					lbp.setMaterials(dm);
 					return true;
 				}
 				// brush size
@@ -78,11 +90,11 @@ public class LandBrush extends JavaPlugin {
 				// base Y
 				else if (args[0].equalsIgnoreCase("base")) {
 					if (args[1].equalsIgnoreCase("me")) {
-						lbp.setBaseY((int)lbp.getPlayer().getLocation().getY());
+						lbp.setBaseY((int)lbp.getPlayer().getLocation().getY() - 1);
 					} 
 					else {
 						try {
-							lbp.setBaseY(Integer.parseInt(args[1]) - 1);
+							lbp.setBaseY(Integer.parseInt(args[1]));
 						} 
 						catch (NumberFormatException e) {
 							sender.sendMessage(ChatColor.RED + "ERROR: Neither string or integer value found for tool.");
@@ -109,7 +121,7 @@ public class LandBrush extends JavaPlugin {
 				// setting the scale
 				else if (args[0].equalsIgnoreCase("scale")) {
 					try {
-						lbp.setScale(Double.parseDouble(args[1]));
+						lbp.setScale(Double.parseDouble(args[1]));							
 					}
 					// catch a number format exception which means we didn't enter a number
 					catch (NumberFormatException e) {
@@ -125,7 +137,7 @@ public class LandBrush extends JavaPlugin {
 						m[0] = Material.matchMaterial(args[1]);
 						m[1] = Material.matchMaterial(args[2]);
 						m[2] = Material.matchMaterial(args[3]);
-						if (m[0].isBlock() && m[1].isBlock() && m[2].isBlock()) {
+						if ((m[0].isBlock() || m[0] == null) && m[1].isBlock() && m[2].isBlock()) {
 							sender.sendMessage(ChatColor.AQUA + "Materials set to " + ChatColor.YELLOW + m[0].toString() + " " + m[1].toString() + " " + m[2].toString() + ChatColor.AQUA + ".");
 							lbp.setMaterials(m);
 						}
@@ -143,6 +155,10 @@ public class LandBrush extends JavaPlugin {
 					lbp.undo();
 					return true;
 				}
+			}
+			else {
+				showHelp(sender, label);
+				return true;
 			}
 				
 		// something else went wrong

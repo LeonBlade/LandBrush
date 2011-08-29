@@ -25,34 +25,30 @@ public class Brush {
 		// grab our cursor position block
 		Block b = hb.getTargetBlock();
 		Random rand = new Random();
-		Integer tempRadius;
+		Integer tempRadius = this.lbPlayer.getBaseY();
 		Material[] materials = this.lbPlayer.getMaterials();
-		
-		// first we want to lay down dirt at the very bottom so we set the material to dirt
-		currentType = materials[0];
-		tempRadius = this.lbPlayer.getBrushSize() + (int) (this.lbPlayer.getBrushSize() * this.lbPlayer.getScale()) + rand.nextInt((int) this.lbPlayer.getScale()) + 1;
 		targetY = this.lbPlayer.getBaseY();
-		circle(b.getX(), b.getZ(), tempRadius);
 		
-		// now we can lay down some sand
+		if (materials[0] != null) {
+			currentType = materials[0];
+			tempRadius = this.lbPlayer.getBrushSize() + (int) (this.lbPlayer.getBrushSize() * this.lbPlayer.getScale()) + rand.nextInt((int) this.lbPlayer.getScale()) + 1;
+			circle(b.getX(), b.getZ(), tempRadius);
+		}
+		
 		currentType = materials[1];
 		tempRadius = this.lbPlayer.getBrushSize() + (int) (this.lbPlayer.getBrushSize() * (this.lbPlayer.getScale()*0.5)) + rand.nextInt((int) this.lbPlayer.getScale()) + 1;
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);
 		
-		// now we can lay down some more sand
 		tempRadius = this.lbPlayer.getBrushSize() + (int) (this.lbPlayer.getBrushSize() * (this.lbPlayer.getScale()*0.2)) + rand.nextInt((int) this.lbPlayer.getScale()) + 1;
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);
 		
-		// now we can lay down one more sand disk
 		tempRadius = this.lbPlayer.getBrushSize() + rand.nextInt(2) + 1;
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);
 		
-		// now we can lay down one more sand disk
 		currentType = materials[2];
-		// setting the range to the this.lbPlayer.getBrushSize()
 		tempRadius = this.lbPlayer.getBrushSize();
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);	

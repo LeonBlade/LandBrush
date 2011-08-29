@@ -54,7 +54,7 @@ public class LandBrushPlayer {
 				} else {
 					// make sure our base Y is set
 					if (getBaseY() < 0) {
-						this.player.sendMessage(ChatColor.RED + "Please set your base height!");
+						this.player.sendMessage(ChatColor.RED + "ERROR: Please set your base height!");
 					} else {
 						// grab our brush and start drawing
 						brush.draw();
@@ -99,7 +99,7 @@ public class LandBrushPlayer {
 	// set the brush size
 	public void setBrushSize(int size) {
 		if (size >= 15) {
-			this.player.sendMessage(ChatColor.GOLD + "Warning: Be careful using big brush sizes!");
+			this.player.sendMessage(ChatColor.GOLD + "WARNING: Be careful using big brush sizes!");
 		}
 		this.player.sendMessage(ChatColor.AQUA + "Brush size set to " + ChatColor.YELLOW + size);
 		this.brushSize = size;
@@ -128,6 +128,9 @@ public class LandBrushPlayer {
 		} else {
 			this.player.sendMessage(ChatColor.AQUA + "Brush scale set to " + ChatColor.YELLOW + s);
 			this.brushScale = s;
+			if (s >= 10) {
+				this.player.sendMessage(ChatColor.GOLD + "WARNING: Be careful using big scale sizes!");
+			}
 		}
 	}
 	
