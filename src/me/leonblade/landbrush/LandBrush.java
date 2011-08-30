@@ -29,20 +29,21 @@ public class LandBrush extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		// let the console know our plugin has been disabled
-		log.info(getDescription().getName() +  " has been disabled.");
+		log.info(logPrefix + "has been disabled.");
 	}
 
 	@Override
 	public void onEnable() {
+		// store log prefix
+		logPrefix = "[" + getDescription().getName() + " v" + getDescription().getVersion() + "] ";
+		
 		// let the console know our plugin has been enabled
-		log.info(getDescription().getName() + " version " + getDescription().getVersion() + " has been enabled.");
-		log.info(String.valueOf((getServer().getOnlinePlayers().length)));
+		log.info(logPrefix + "has been enabled.");
 		
 		// in case people are using permissions plugin
 		setupPermissions();
 		
-		logPrefix = "[" + getDescription().getName() + "] ";
-		
+		// add all the players to land brush
 		for (Player p : getServer().getOnlinePlayers()) {
 			this.addLandBrushPlayer(p);
 		}
@@ -53,6 +54,7 @@ public class LandBrush extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_JOIN, landBrushPlayerListener, Event.Priority.Normal, this);
 	}
 	
+	// shows the help menu
 	private void showHelp(CommandSender sender, String label) {
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "LandBrush Help Menu");
 		sender.sendMessage("/" + label + " help " + ChatColor.GRAY + "(shows this menu)");
@@ -251,12 +253,12 @@ public class LandBrush extends JavaPlugin {
 		Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
 
 		if (permissionsPlugin == null) {
-			log.info("Permission system not detected, defaulting to OP");
+			log.info(logPrefix + "Permission system not detected, defaulting to OP");
 		    return;
 		}
 
 		permissionHandler = ((Permissions) permissionsPlugin).getHandler();
-		log.info("Found and will use plugin "+((Permissions)permissionsPlugin).getDescription().getFullName());
+		log.info(logPrefix + "Found and will use plugin "+((Permissions)permissionsPlugin).getDescription().getFullName());
 	}
 
 }
