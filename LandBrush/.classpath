@@ -7,6 +7,6 @@
 			<attribute name="javadoc_location" value="http://jd.bukkit.org/apidocs/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/LeonBlade/Programming/Permissions.jar"/>
+	<classpathentry kind="lib" path="/Users/LeonBlade/Downloads/bukkit181/plugins/PermissionsBukkit-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

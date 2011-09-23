@@ -24,17 +24,20 @@ public class Brush {
 		
 		// grab our cursor position block
 		Block b = hb.getTargetBlock();
+		
+		System.out.printf("%f %f %f", b.getX(), b.getY(), b.getZ());
+		
 		Random rand = new Random();
 		Integer tempRadius = this.lbPlayer.getBaseY();
 		Material[] materials = this.lbPlayer.getMaterials();
-		targetY = this.lbPlayer.getBaseY();
+		int targetY = this.lbPlayer.getBaseY();
 		
 		currentType = materials[0];
-		tempRadius = this.lbPlayer.getBrushSize() + (int) (this.lbPlayer.getBrushSize() * (this.lbPlayer.getScale()*0.5)) + rand.nextInt((int) this.lbPlayer.getScale()) + 1;
+		tempRadius = this.lbPlayer.getBrushSize() + this.lbPlayer.getBrushSize() + (int)Math.round(this.lbPlayer.getSpread());
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);
 		
-		tempRadius = this.lbPlayer.getBrushSize() + (int) (this.lbPlayer.getBrushSize() * (this.lbPlayer.getScale()*0.2)) + rand.nextInt((int) this.lbPlayer.getScale()) + 1;
+		tempRadius = this.lbPlayer.getBrushSize() + this.lbPlayer.getBrushSize() + (int)(this.lbPlayer.getSpread() * 0.5);
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);
 		
@@ -46,6 +49,8 @@ public class Brush {
 		tempRadius = this.lbPlayer.getBrushSize();
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);	
+		
+		System.out.printf("drawing shit\n");
 		
 		// push our undo to the player
 		this.lbPlayer.addUndoStep(undo);

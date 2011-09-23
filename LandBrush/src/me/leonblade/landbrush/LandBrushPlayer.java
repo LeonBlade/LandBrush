@@ -16,7 +16,7 @@ public class LandBrushPlayer {
 	private Player player;
 	private int baseY = -1;
 	private int brushSize = 5;
-	private double brushScale = 3.0;
+	private int brushSpread = 5;
 	private Material[] materials = { Material.SAND, Material.GRASS };
 	private int hashEn = 0;
 	private Material tool = Material.WOOD_SPADE;
@@ -43,22 +43,20 @@ public class LandBrushPlayer {
 		// if we are currently holding our tool
 		if (this.player.getItemInHand().getType() == tool) {
 			// if we are right clicking on the air or a block
-			if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-				// check to see if we are sneaking or not
-				if (this.player.isSneaking()) {
-					// grab our hitblox and our target block
-					HitBlox hb = new HitBlox(this.player, this.player.getWorld());
-					Block b = hb.getTargetBlock();
-					// set our base Y position
-					setBaseY(b.getY());
+			if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)	{
+				// grab our hitblox and our target block
+				HitBlox hb = new HitBlox(this.player, this.player.getWorld());
+				Block b = hb.getTargetBlock();
+				// set our base Y position
+				setBaseY(b.getY());
+			}
+			else if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+				// make sure our base Y is set
+				if (getBaseY() < 0) {
+					this.player.sendMessage(ChatColor.RED + "ERROR: Please set your base height!");
 				} else {
-					// make sure our base Y is set
-					if (getBaseY() < 0) {
-						this.player.sendMessage(ChatColor.RED + "ERROR: Please set your base height!");
-					} else {
-						// grab our brush and start drawing
-						brush.draw();
-					}
+					// grab our brush and start drawing
+					brush.draw();
 				}
 			}
 		}
@@ -122,12 +120,12 @@ public class LandBrushPlayer {
 	}
 	
 	// set the scale
-	public void setScale(double s) {
+	public void setSpread(int s) {
 		if (s < 1) {
-			this.player.sendMessage(ChatColor.RED + "Please choose a scale of at least 1.0!");
+			this.player.sendMessage(ChatColor.RED + "Please choose a scale of at least 1!");
 		} else {
 			this.player.sendMessage(ChatColor.AQUA + "Brush scale set to " + ChatColor.YELLOW + s);
-			this.brushScale = s;
+			this.brushSpread = s;
 			if (s >= 10) {
 				this.player.sendMessage(ChatColor.GOLD + "WARNING: Be careful using big scale sizes!");
 			}
@@ -135,8 +133,8 @@ public class LandBrushPlayer {
 	}
 	
 	// get the scale
-	public double getScale() {
-		return this.brushScale;
+	public int getSpread() {
+		return this.brushSpread;
 	}
 	
 	// set the materials

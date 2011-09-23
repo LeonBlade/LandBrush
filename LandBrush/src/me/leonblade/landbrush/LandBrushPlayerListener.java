@@ -27,7 +27,7 @@ public class LandBrushPlayerListener extends PlayerListener {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		super.onPlayerInteract(event);
 		// get the player based on the object passed in the event and pass through the event
-		if (event.getPlayer().hasPermission("landbrush.*") || LandBrush.permissionHandler.has(event.getPlayer(), "landbrush.*")) {
+		if ((event.getPlayer().hasPermission("landbrush.*") || event.getPlayer().isOp())) {
 			try {
 				LandBrushPlayer lbp = this.plugin.getLandBrushPlayers().get(event.getPlayer().getName());
 				lbp.onPlayerEvent(event);

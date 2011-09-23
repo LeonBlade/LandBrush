@@ -11,12 +11,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
+// import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
+// import com.nijiko.permissions.PermissionHandler;
+// import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class LandBrush extends JavaPlugin {
 
@@ -24,7 +24,7 @@ public class LandBrush extends JavaPlugin {
 	private final LandBrushPlayerListener landBrushPlayerListener = new LandBrushPlayerListener(this);
 	protected static final Logger log = Logger.getLogger("Minecraft");
 	private static String logPrefix;
-	public static PermissionHandler permissionHandler;
+	// public static PermissionHandler permissionHandler;
 	
 	@Override
 	public void onDisable() {
@@ -41,7 +41,7 @@ public class LandBrush extends JavaPlugin {
 		log.info(logPrefix + "has been enabled.");
 		
 		// in case people are using permissions plugin
-		setupPermissions();
+		// setupPermissions();
 		
 		// add all the players to land brush
 		for (Player p : getServer().getOnlinePlayers()) {
@@ -72,7 +72,7 @@ public class LandBrush extends JavaPlugin {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		Player p = ((Player)sender);
+		Player p = sender.getServer().getPlayer(sender.getName());
 		String arglist = "";
 		for (int i = 0; i < args.length; i++) {
 			arglist = arglist.concat(args[i] + " ");
@@ -80,7 +80,7 @@ public class LandBrush extends JavaPlugin {
 		// get the landbrush player from the sender
 		try {
 			LandBrushPlayer lbp = this.landBrushPlayers.get(((Player) sender).getName());
-			if (command.getName().equalsIgnoreCase("landbrush") && args.length >= 1 && (p.hasPermission("landbrush.*") || permissionHandler.has(p, "landbrush.*"))) {
+			if (command.getName().equalsIgnoreCase("landbrush") && args.length >= 1 && (sender.hasPermission("landbrush.*") || sender.isOp())) {
 				// help command				
 				if (args[0].equalsIgnoreCase("help")) {
 					showHelp(sender, label);
@@ -89,7 +89,7 @@ public class LandBrush extends JavaPlugin {
 				else if (args[0].equalsIgnoreCase("default")) {
 					Material[] dm = { Material.SAND, Material.GRASS };
 					lbp.setBrushSize(5);
-					lbp.setScale(3.0);
+					lbp.setSpread(3);
 					lbp.setMaterials(dm);
 					return true;
 				}
@@ -151,7 +151,7 @@ public class LandBrush extends JavaPlugin {
 				// setting the scale
 				else if (args[0].equalsIgnoreCase("scale")) {
 					try {
-						lbp.setScale(Double.parseDouble(args[1]));							
+						lbp.setSpread(Integer.parseInt(args[1]));							
 					}
 					// catch a number format exception which means we didn't enter a number
 					catch (NumberFormatException e) {
@@ -208,12 +208,14 @@ public class LandBrush extends JavaPlugin {
 	
 	// gets the hashmap for landbrush players
 	public HashMap<String, LandBrushPlayer> getLandBrushPlayers() {
+		log.info("hashmap has " + this.landBrushPlayers.toString());
 		return this.landBrushPlayers;
 	}
 	
 	// makes sure that we add a player into the hashmap
 	public void addLandBrushPlayer(Player player) {
-		if (player.hasPermission("landbrush.*") || permissionHandler.has(player, "landbrush.*")) {
+		log.info("hashmap has " + this.landBrushPlayers.toString());
+		if ((player.hasPermission("landbrush.*") || player.isOp()) /*|| permissionHandler.has(player, "landbrush.*")*/) {
 			player.sendMessage(ChatColor.GREEN + "LandBrush enabled!");
 			// if our player exists
 			LandBrushPlayer lbp;
@@ -231,6 +233,7 @@ public class LandBrush extends JavaPlugin {
 			}
 		}
 		else {
+			log.info("Removing " + player.getName());
 			try {
 				this.landBrushPlayers.remove(player.getName());
 			} catch (NullPointerException e) {}
@@ -248,7 +251,7 @@ public class LandBrush extends JavaPlugin {
 		catch (NullPointerException e) {}
 	}
 	
-	private void setupPermissions() { 
+	/*private void setupPermissions() { 
 		if (permissionHandler != null) { return; }
 		Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
 
@@ -259,6 +262,6 @@ public class LandBrush extends JavaPlugin {
 
 		permissionHandler = ((Permissions) permissionsPlugin).getHandler();
 		log.info(logPrefix + "Found and will use plugin "+((Permissions)permissionsPlugin).getDescription().getFullName());
-	}
+	}*/
 
 }

@@ -6,9 +6,5 @@ main: me.leonblade.landbrush.LandBrush
 commands:
     landbrush:
         description: The base of all commands for landbrush
-        permission: landbrush
+        permissions: landbrush
         usage: /<command> <func> [<arg0> ... <argX>]   
-permissions:
-    landbrush.*:
-        description: Gives access to using LandBrush
-        default: op
