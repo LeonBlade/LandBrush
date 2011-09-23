@@ -21,16 +21,12 @@ public class Brush {
 	public void draw() {
 		// get our hitblox
 		HitBlox hb = new HitBlox(this.lbPlayer.getPlayer(), this.lbPlayer.getPlayer().getWorld());
-		
-		// grab our cursor position block
 		Block b = hb.getTargetBlock();
-		
-		System.out.printf("%f %f %f", b.getX(), b.getY(), b.getZ());
 		
 		Random rand = new Random();
 		Integer tempRadius = this.lbPlayer.getBaseY();
 		Material[] materials = this.lbPlayer.getMaterials();
-		int targetY = this.lbPlayer.getBaseY();
+		targetY = this.lbPlayer.getBaseY();
 		
 		currentType = materials[0];
 		tempRadius = this.lbPlayer.getBrushSize() + this.lbPlayer.getBrushSize() + (int)Math.round(this.lbPlayer.getSpread());
@@ -49,8 +45,6 @@ public class Brush {
 		tempRadius = this.lbPlayer.getBrushSize();
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);	
-		
-		System.out.printf("drawing shit\n");
 		
 		// push our undo to the player
 		this.lbPlayer.addUndoStep(undo);
