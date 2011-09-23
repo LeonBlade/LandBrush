@@ -208,21 +208,11 @@ public class LandBrush extends JavaPlugin {
 	
 	// makes sure that we add a player into the hashmap
 	public void addLandBrushPlayer(Player player) {
+		log.info("HashMap: " + landBrushPlayers.toString());
 		log.info("Adding " + player.getName());
 		if (player.hasPermission("landbrush.*") || player.isOp()) {
 			player.sendMessage(ChatColor.GREEN + "LandBrush enabled!");
-			// if our player exists
-			LandBrushPlayer lbp;
-			try {
-				lbp = landBrushPlayers.get(player.getName());
-				landBrushPlayers.remove(player.getName());
-				landBrushPlayers.put(player.getName(), new LandBrushPlayer(player));
-			}
-			// the player does not exist
-			catch (NullPointerException e) {
-				lbp = new LandBrushPlayer(player);
-				landBrushPlayers.put(player.getName(), lbp);
-			}
+			landBrushPlayers.put(player.getName(), new LandBrushPlayer(player));
 		}
 		else {
 			log.info("Removing " + player.getName());

@@ -29,16 +29,13 @@ public class LandBrushPlayerListener extends PlayerListener {
 		// get the player based on the object passed in the event and pass through the event
 		if ((event.getPlayer().hasPermission("landbrush.*") || event.getPlayer().isOp())) {
 			try {
-				log.info("yo dawg you got dat shit?");
 				LandBrushPlayer lbp = LandBrush.landBrushPlayers.get(event.getPlayer().getName());
 				lbp.onPlayerEvent(event);
 			} catch (Exception e) {
-				log.info("nah? ill hook u up bro");
 				this.plugin.addLandBrushPlayer(event.getPlayer());
 			}
 		}
 		else {
-			log.info("fuck yo shit nigga");
 			this.plugin.removeLandBrushPlayer(event.getPlayer());
 		}
 	}
