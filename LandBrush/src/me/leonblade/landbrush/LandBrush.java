@@ -11,20 +11,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
-// import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-// import com.nijiko.permissions.PermissionHandler;
-// import com.nijikokun.bukkit.Permissions.Permissions;
-
 public class LandBrush extends JavaPlugin {
-
-	private HashMap<String, LandBrushPlayer> landBrushPlayers = new HashMap<String, LandBrushPlayer>();
+	
+	public static HashMap<String, LandBrushPlayer> landBrushPlayers = new HashMap<String, LandBrushPlayer>();
 	private final LandBrushPlayerListener landBrushPlayerListener = new LandBrushPlayerListener(this);
 	protected static final Logger log = Logger.getLogger("Minecraft");
 	private static String logPrefix;
-	// public static PermissionHandler permissionHandler;
 	
 	@Override
 	public void onDisable() {
@@ -79,7 +74,7 @@ public class LandBrush extends JavaPlugin {
 		}
 		// get the landbrush player from the sender
 		try {
-			LandBrushPlayer lbp = this.landBrushPlayers.get(((Player) sender).getName());
+			LandBrushPlayer lbp = landBrushPlayers.get(((Player) sender).getName());
 			if (command.getName().equalsIgnoreCase("landbrush") && args.length >= 1 && (sender.hasPermission("landbrush.*") || sender.isOp())) {
 				// help command				
 				if (args[0].equalsIgnoreCase("help")) {
@@ -208,60 +203,45 @@ public class LandBrush extends JavaPlugin {
 	
 	// gets the hashmap for landbrush players
 	public HashMap<String, LandBrushPlayer> getLandBrushPlayers() {
-		log.info("hashmap has " + this.landBrushPlayers.toString());
-		return this.landBrushPlayers;
+		return landBrushPlayers;
 	}
 	
 	// makes sure that we add a player into the hashmap
 	public void addLandBrushPlayer(Player player) {
-		log.info("hashmap has " + this.landBrushPlayers.toString());
-		if ((player.hasPermission("landbrush.*") || player.isOp()) /*|| permissionHandler.has(player, "landbrush.*")*/) {
+		log.info("Adding " + player.getName());
+		if (player.hasPermission("landbrush.*") || player.isOp()) {
 			player.sendMessage(ChatColor.GREEN + "LandBrush enabled!");
 			// if our player exists
 			LandBrushPlayer lbp;
 			try {
-				lbp = this.landBrushPlayers.get(player.getName());
-				this.landBrushPlayers.remove(player.getName());
-				this.landBrushPlayers.put(player.getName(), new LandBrushPlayer(player));
+				lbp = landBrushPlayers.get(player.getName());
+				landBrushPlayers.remove(player.getName());
+				landBrushPlayers.put(player.getName(), new LandBrushPlayer(player));
 			}
 			// the player does not exist
 			catch (NullPointerException e) {
 				lbp = new LandBrushPlayer(player);
-				this.landBrushPlayers.put(player.getName(), lbp);
-				log.info("Player is now a landbrush player " + player.getName());
-				player.sendMessage(ChatColor.GREEN + "You're now a LandBrush player!");
+				landBrushPlayers.put(player.getName(), lbp);
 			}
 		}
 		else {
 			log.info("Removing " + player.getName());
 			try {
-				this.landBrushPlayers.remove(player.getName());
+				landBrushPlayers.remove(player.getName());
 			} catch (NullPointerException e) {}
 		}
 	}
 	
 	// remove them from hashmap
 	public void removeLandBrushPlayer(Player player) {
+		log.info("Removing " + player.getName());
 		try {
-			if (this.landBrushPlayers.containsKey(player.getName())) {
-				this.landBrushPlayers.remove(player.getName());
+			if (landBrushPlayers.containsKey(player.getName())) {
+				landBrushPlayers.remove(player.getName());
 				player.sendMessage(ChatColor.RED + "LandBrush diabled.");
 			}
 		}
 		catch (NullPointerException e) {}
 	}
-	
-	/*private void setupPermissions() { 
-		if (permissionHandler != null) { return; }
-		Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
-
-		if (permissionsPlugin == null) {
-			log.info(logPrefix + "Permission system not detected, defaulting to OP");
-		    return;
-		}
-
-		permissionHandler = ((Permissions) permissionsPlugin).getHandler();
-		log.info(logPrefix + "Found and will use plugin "+((Permissions)permissionsPlugin).getDescription().getFullName());
-	}*/
 
 }
