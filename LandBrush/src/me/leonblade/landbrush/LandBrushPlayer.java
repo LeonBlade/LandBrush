@@ -22,11 +22,18 @@ public class LandBrushPlayer {
 	private Material tool = Material.WOOD_SPADE;
 	private HashMap<Integer, LBUndo> hashUndo = new HashMap<Integer, LBUndo>();
 	private Brush brush = new Brush(this);
+	private boolean state = true;
 	
 	// create a new landbrush player and set the player for it
 	public LandBrushPlayer(Player player) {
 		this.player = player;
 	}	
+	
+	// updating a player rather than remaking one
+	public void updatePlayer(Player player) {
+		log.info("Updating player " + player.getName() + "...");
+		this.player = player;
+	}
 	
 	// land brush undo hash set to hold all
 	public static class LBUndo {
@@ -41,12 +48,13 @@ public class LandBrushPlayer {
 	// i decided on responding to the event so that the player can handle everything on his own
 	public void onPlayerEvent(PlayerInteractEvent event) {
 		// if we are currently holding our tool
-		if (this.player.getItemInHand().getType() == tool) {
+		if (this.player.getItemInHand().getType() == tool && this.state) {
 			// if we are right clicking on the air or a block
+			HitBlox hb = new HitBlox(this.player, this.player.getWorld());
+			Block b = hb.getTargetBlock();
+			
 			if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK)	{
 				// grab our hitblox and our target block
-				HitBlox hb = new HitBlox(this.player, this.player.getWorld());
-				Block b = hb.getTargetBlock();
 				// set our base Y position
 				setBaseY(b.getY());
 			}
@@ -76,6 +84,21 @@ public class LandBrushPlayer {
 		} else {
 			this.player.sendMessage(ChatColor.RED + "Nothing left to undo.");
 		}
+	}
+	
+	// get undo count
+	public int getUndoSize() {
+		return this.hashUndo.size();
+	}
+	
+	// gets the state
+	public boolean getState() {
+		return this.state;
+	}
+	
+	// sets state on or off
+	public void setState(boolean s) {
+		this.state = s;
 	}
 	
 	// get player

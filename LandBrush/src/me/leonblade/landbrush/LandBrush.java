@@ -35,9 +35,6 @@ public class LandBrush extends JavaPlugin {
 		// let the console know our plugin has been enabled
 		log.info(logPrefix + "has been enabled.");
 		
-		// in case people are using permissions plugin
-		// setupPermissions();
-		
 		// add all the players to land brush
 		for (Player p : getServer().getOnlinePlayers()) {
 			this.addLandBrushPlayer(p);
@@ -53,16 +50,14 @@ public class LandBrush extends JavaPlugin {
 	private void showHelp(CommandSender sender, String label) {
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "LandBrush Help Menu");
 		sender.sendMessage("/" + label + " help " + ChatColor.GRAY + "(shows this menu)");
+		sender.sendMessage("/" + label + " [on/off] " + ChatColor.GRAY + "(turns plugin on or off for you)");
 		sender.sendMessage("/" + label + " default " + ChatColor.GRAY + "(sets settings to default)");
-		sender.sendMessage("/" + label + " undo " + ChatColor.GRAY + "(goes back in time via a TARDIS)");
+		sender.sendMessage("/" + label + " undo [all/steps] " + ChatColor.GRAY + "(goes back in time via a TARDIS)");
 		sender.sendMessage("/" + label + " size 5 " + ChatColor.GRAY + "(sets brush size)");
-		sender.sendMessage("/" + label + " base me" + ChatColor.GRAY + "(sets base height to your Y position)");
-		sender.sendMessage("/" + label + " base 72 " + ChatColor.GRAY + "(sets base size statically)");
-		sender.sendMessage("/" + label + " tool wood_spade " + ChatColor.GRAY + "(sets the tool by name)");
-		sender.sendMessage("/" + label + " tool 269 " + ChatColor.GRAY + "(sets the tool by ID)");
-		sender.sendMessage("/" + label + " scale 3 " + ChatColor.GRAY + "(sets the scale of the beach sand)");
-		sender.sendMessage("/" + label + " material 12 2 " + ChatColor.GRAY + "(sets materials by ID)");
-		sender.sendMessage("/" + label + " material sand grass " + ChatColor.GRAY + "(sets materials by name)");
+		sender.sendMessage("/" + label + " base [72/me] " + ChatColor.GRAY + "(sets base height to your Y position)");
+		sender.sendMessage("/" + label + " tool [269/wood_spade] " + ChatColor.GRAY + "(sets the tool by name)");
+		sender.sendMessage("/" + label + " spread 3 " + ChatColor.GRAY + "(sets the spread of the bottom)");
+		sender.sendMessage("/" + label + " material [12/sand 2/grass] " + ChatColor.GRAY + "(sets materials by ID)");
 	}
 	
 	@Override
@@ -79,6 +74,16 @@ public class LandBrush extends JavaPlugin {
 				// help command				
 				if (args[0].equalsIgnoreCase("help")) {
 					showHelp(sender, label);
+					return true;
+				}
+				else if (args[0].equalsIgnoreCase("on")) {
+					lbp.setState(true);
+					sender.sendMessage(ChatColor.AQUA + "You have turned LandBrush " + ChatColor.GOLD + "ON" + ChatColor.AQUA + ".");
+					return true;
+				}
+				else if (args[0].equalsIgnoreCase("off")) {
+					lbp.setState(false);
+					sender.sendMessage(ChatColor.AQUA + "You have turned LandBrush " + ChatColor.GOLD + "OFF" + ChatColor.AQUA + ".");
 					return true;
 				}
 				else if (args[0].equalsIgnoreCase("default")) {
@@ -144,13 +149,13 @@ public class LandBrush extends JavaPlugin {
 					return true;
 				}
 				// setting the scale
-				else if (args[0].equalsIgnoreCase("scale")) {
+				else if (args[0].equalsIgnoreCase("spread")) {
 					try {
 						lbp.setSpread(Integer.parseInt(args[1]));							
 					}
 					// catch a number format exception which means we didn't enter a number
 					catch (NumberFormatException e) {
-						sender.sendMessage(ChatColor.RED + "ERROR: Scale needs to be a double value (3.0 by default).");
+						sender.sendMessage(ChatColor.RED + "ERROR: Spread needs to be an integer value (3 by default).");
 					}					
 					return true;
 				}
@@ -175,7 +180,29 @@ public class LandBrush extends JavaPlugin {
 				}
 				// the time traveling machine
 				else if (args[0].equalsIgnoreCase("undo")) {
-					lbp.undo();
+					try {
+						if (args.length == 2) {
+							if (args[1].equalsIgnoreCase("all")) {
+								sender.sendMessage(ChatColor.GREEN + "Undoing all of your steps...");
+								for (int i = 0; i < lbp.getUndoSize(); i++) {
+									lbp.undo();
+								}
+							}
+							else {
+    							int steps = Integer.parseInt(args[1]);
+    							sender.sendMessage(ChatColor.GREEN + "Undoing " + steps + " steps...");
+    							for (int i = 0; i < steps; i++) {
+    								lbp.undo();
+    							}
+							}
+						} 
+						else {
+							lbp.undo();
+						} 
+					} 
+					catch (NumberFormatException e) {
+						sender.sendMessage(ChatColor.RED + "ERROR: Steps needs to be a number.");
+					}
 					return true;
 				}
 			}
