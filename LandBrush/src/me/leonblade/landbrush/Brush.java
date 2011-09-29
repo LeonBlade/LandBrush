@@ -27,20 +27,20 @@ public class Brush {
 		Integer tempRadius = this.lbPlayer.getBaseY();
 		Material[] materials = this.lbPlayer.getMaterials();
 		targetY = this.lbPlayer.getBaseY();
-		
+
 		currentType = materials[0];
 		tempRadius = this.lbPlayer.getBrushSize() + this.lbPlayer.getBrushSize() + (int)Math.round(this.lbPlayer.getSpread());
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);
-		
+
 		tempRadius = this.lbPlayer.getBrushSize() + this.lbPlayer.getBrushSize() + (int)(this.lbPlayer.getSpread() * 0.5);
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);
-		
+
 		tempRadius = this.lbPlayer.getBrushSize() + rand.nextInt(2) + 1;
 		targetY++;
 		circle(b.getX(), b.getZ(), tempRadius);
-		
+
 		currentType = materials[1];
 		tempRadius = this.lbPlayer.getBrushSize();
 		targetY++;
